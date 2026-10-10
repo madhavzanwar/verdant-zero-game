@@ -1,0 +1,385 @@
+/* ---------- Palette ----------
+   Background: rgb(14, 28, 38)
+   Green:   rgb(120, 230, 170)
+   Smog:    rgb(150, 140, 110)
+*/
+
+.root-container {
+    flex-grow: 1;
+    background-color: rgb(14, 28, 38);
+    overflow: hidden;
+}
+
+/* ---------- Background ---------- */
+
+.background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* Stage with the key art's aspect ratio (1376x768); MainMenuBackground.cs
+   sizes it to cover the screen. Layers use % of the image. */
+.bg-stage {
+    position: absolute;
+    /* The slow zoom grows down and to the left, away from the logo */
+    transform-origin: 80% 0;
+}
+
+.bg-base,
+.bg-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.bg-base {
+    background-image: url("Art/menu_bg_base.jpg");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.bg-drone {
+    position: absolute;
+    left: 30.523%;
+    top: 53.646%;
+    width: 30.669%;
+    height: 34.115%;
+    background-image: url("Art/menu_drone.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.bg-logo {
+    position: absolute;
+    left: 51.744%;
+    top: 3.646%;
+    width: 44.331%;
+    height: 20.833%;
+    background-image: url("Art/menu_logo.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.bg-logo-glow {
+    position: absolute;
+    left: 50%;
+    top: 0.521%;
+    width: 47.820%;
+    height: 27.083%;
+    background-image: url("Art/menu_logo_glow.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    opacity: 0;
+}
+
+.bg-beam {
+    position: absolute;
+    left: 47.965%;
+    top: 22.135%;
+    width: 37.5%;
+    height: 42.969%;
+    background-image: url("Art/menu_beam_glow.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    opacity: 0.3;
+}
+
+.bg-flare {
+    position: absolute;
+    background-image: url("Art/menu_flare.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.bg-impact {
+    left: 79.506%;
+    top: 19.922%;
+    width: 6.977%;
+    height: 12.5%;
+}
+
+/* Propeller lights: % of the drone cutout (422x262) */
+.bg-rotor {
+    width: 9.479%;
+    height: 15.267%;
+    opacity: 0.4;
+}
+
+.bg-rotor--1 { left: 5.213%; top: 11.832%; }
+.bg-rotor--2 { left: 23.934%; top: -1.527%; }
+.bg-rotor--3 { left: 87.204%; top: 13.740%; }
+.bg-rotor--4 { left: 72.275%; top: 31.679%; }
+
+.bg-smoke-puff {
+    position: absolute;
+    background-image: url("Art/menu_smoke.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    opacity: 0;
+}
+
+/* ---------- Content ---------- */
+
+.safe-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    /* Buttons on the left to keep the drone and logo in view */
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32px 32px 32px 64px;
+}
+
+.menu {
+    align-items: flex-start;
+    width: 100%;
+    max-width: 460px;
+    flex-shrink: 1;
+    opacity: 0;
+    translate: 0 24px;
+    transition-property: opacity, translate;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
+}
+
+.menu--visible {
+    opacity: 1;
+    translate: 0 0;
+}
+
+.button-column {
+    width: 100%;
+    max-width: 460px;
+}
+
+.menu-button {
+    /* Minimum 48 dp touch target (GDD 10.4, WCAG 2.5.5): ~120 px at the reference resolution on a typical phone */
+    min-height: 120px;
+    margin: 8px 0;
+    padding: 0 24px;
+    font-size: 38px;
+    letter-spacing: 4px;
+    -unity-font-style: bold;
+    color: white;
+    background-color: rgba(32, 70, 78, 0.9);
+    border-width: 3px;
+    border-color: rgb(120, 230, 170);
+    border-radius: 24px;
+    transition-property: background-color, scale, opacity;
+    transition-duration: 0.15s;
+}
+
+.menu-button:hover,
+.menu-button:focus {
+    background-color: rgb(44, 102, 104);
+}
+
+.menu-button:active {
+    background-color: rgb(120, 230, 170);
+    color: rgb(14, 28, 38);
+    scale: 0.96 0.96;
+}
+
+.menu-button:disabled {
+    opacity: 0.5;
+}
+
+.menu-button--primary {
+    min-height: 128px;
+    font-size: 44px;
+    /* Darkened green: white text with 5.4:1 contrast (WCAG 1.4.3) */
+    background-color: rgb(30, 122, 82);
+    border-color: rgb(160, 245, 195);
+}
+
+.menu-button--primary:hover,
+.menu-button--primary:focus {
+    background-color: rgb(40, 140, 94);
+}
+
+.menu-button--ghost {
+    background-color: rgba(14, 28, 38, 0.6);
+    border-color: rgb(110, 130, 140);
+    color: rgb(185, 205, 210);
+}
+
+.menu-button--ghost:hover,
+.menu-button--ghost:focus {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.version {
+    position: absolute;
+    bottom: 24px;
+    right: 32px;
+    font-size: 24px;
+    color: rgb(160, 178, 186);
+}
+
+/* ---------- Options panel ---------- */
+
+.overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background-color: rgba(5, 12, 16, 0.75);
+    display: none;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.2s;
+}
+
+.overlay--visible {
+    opacity: 1;
+}
+
+.panel {
+    width: 100%;
+    max-width: 760px;
+    /* Tight vertical spacing: with 48 dp rows, Options must fit in 1080 px of height */
+    padding: 28px 48px;
+    background-color: rgb(20, 40, 50);
+    border-width: 3px;
+    border-color: rgb(120, 230, 170);
+    border-radius: 32px;
+}
+
+.panel-title {
+    font-size: 56px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    letter-spacing: 6px;
+    color: rgb(120, 230, 170);
+    margin-bottom: 8px;
+}
+
+.panel-button {
+    margin-top: 12px;
+}
+
+.option-slider,
+.option-toggle {
+    /* The whole row responds to touch: it is the 48 dp target */
+    min-height: 120px;
+    margin: 6px 0;
+    align-items: center;
+}
+
+.option-slider .unity-base-field__label,
+.option-toggle .unity-base-field__label {
+    min-width: 220px;
+    font-size: 34px;
+    color: white;
+}
+
+.option-slider .unity-base-slider__tracker {
+    height: 12px;
+    margin-top: -6px;
+    border-radius: 6px;
+    border-width: 0;
+    background-color: rgb(50, 80, 88);
+}
+
+.option-slider .unity-base-slider__dragger {
+    width: 64px;
+    height: 64px;
+    margin-top: -32px;
+    margin-left: -32px;
+    border-radius: 32px;
+    border-width: 0;
+    background-color: rgb(120, 230, 170);
+}
+
+.option-toggle .unity-toggle__checkmark {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    border-width: 3px;
+    border-color: rgb(120, 230, 170);
+    background-color: rgb(50, 80, 88);
+}
+
+.option-toggle:checked .unity-toggle__checkmark {
+    background-color: rgb(120, 230, 170);
+}
+
+/* Two toggles side by side (Vibration | Fullscreen) so the panels still fit in 1080 px */
+.option-row {
+    flex-direction: row;
+}
+
+.option-row__item {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+.option-row__item .unity-base-field__label {
+    min-width: 0;
+    margin-right: 16px;
+}
+
+/* ---------- Scene transition ---------- */
+
+.fade {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(0, 0, 0);
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.4s;
+}
+
+.fade--visible {
+    opacity: 1;
+}
+
+/* ---------- Level select ---------- */
+
+.level-button {
+    -unity-text-align: middle-left;
+    padding-left: 40px;
+    /* Fredoka is wider: the level name must fit in the button */
+    font-size: 36px;
+    letter-spacing: 2px;
+}
+
+.level-best {
+    font-size: 28px;
+    color: rgb(255, 214, 102);
+    -unity-text-align: middle-center;
+    margin: -4px 0 8px 0;
+}
+
+/* ---------- Credits ---------- */
+
+.credits-panel {
+    max-height: 100%;
+}
+
+.credits-scroll {
+    max-height: 640px;
+    flex-shrink: 1;
+}
+
+.credits-heading {
+    font-size: 30px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(120, 230, 170);
+    margin-top: 16px;
+}
+
+.credits-line {
+    font-size: 28px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    color: rgb(225, 235, 230);
+}

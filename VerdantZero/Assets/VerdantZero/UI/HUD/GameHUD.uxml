@@ -1,0 +1,80 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <!-- Reuses the main menu buttons, panel, sliders, overlay and fade -->
+    <Style src="project://database/Assets/VerdantZero/UI/MainMenu/MainMenu.uss"/>
+    <Style src="project://database/Assets/VerdantZero/UI/HUD/GameHUD.uss"/>
+    <ui:VisualElement name="game-hud-root" class="game-hud-root" picking-mode="Ignore">
+
+        <!-- Beam crosshair (GameHudController places it where the beam is aiming) -->
+        <ui:VisualElement name="crosshair" class="crosshair" picking-mode="Ignore">
+            <!-- Dark outline behind the corners: keeps the crosshair visible against a bright sky -->
+            <ui:VisualElement class="crosshair__corner crosshair__corner--outline crosshair__corner--tl" picking-mode="Ignore"/>
+            <ui:VisualElement class="crosshair__corner crosshair__corner--outline crosshair__corner--tr" picking-mode="Ignore"/>
+            <ui:VisualElement class="crosshair__corner crosshair__corner--outline crosshair__corner--bl" picking-mode="Ignore"/>
+            <ui:VisualElement class="crosshair__corner crosshair__corner--outline crosshair__corner--br" picking-mode="Ignore"/>
+            <!-- Four square corners -->
+            <ui:VisualElement class="crosshair__corner crosshair__corner--tl" picking-mode="Ignore"/>
+            <ui:VisualElement class="crosshair__corner crosshair__corner--tr" picking-mode="Ignore"/>
+            <ui:VisualElement class="crosshair__corner crosshair__corner--bl" picking-mode="Ignore"/>
+            <ui:VisualElement class="crosshair__corner crosshair__corner--br" picking-mode="Ignore"/>
+        </ui:VisualElement>
+
+        <!-- Markers over the smog clouds (CloudMarkersController); below the controls -->
+        <ui:VisualElement name="cloud-markers" class="cloud-markers" picking-mode="Ignore"/>
+
+        <!-- Controls inside the safe area (notch) -->
+        <ui:VisualElement name="game-hud-safe-area" class="game-hud-safe-area" picking-mode="Ignore">
+            <!-- Touch controls (GDD 6.2): joystick on the left; climb, descend and Beam on the right.
+                 The buttons are held down (GameHudController). -->
+            <ui:VisualElement name="touch-controls" class="touch-controls" picking-mode="Ignore">
+                <ui:VisualElement name="touch-zone-left" class="touch-zone touch-zone--left"/>
+                <ui:VisualElement name="btn-up" class="altitude-button altitude-button--up">
+                    <ui:Label text="▲" class="altitude-button__label" picking-mode="Ignore"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="btn-down" class="altitude-button altitude-button--down">
+                    <ui:Label text="▼" class="altitude-button__label" picking-mode="Ignore"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="btn-seed" class="action-button action-button--seed">
+                    <ui:Label text="SEED" class="action-button__label" picking-mode="Ignore"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="btn-beam" class="action-button action-button--beam">
+                    <ui:Label text="BEAM" class="action-button__label" picking-mode="Ignore"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <!-- Map edge warning (GDD 5.4); GameHudController shows it near the walls -->
+            <ui:Label text="OUT OF RANGE · return to the city" name="hud-boundary" class="hud-boundary" picking-mode="Ignore"/>
+            <!-- Each voice line shown in the center while it plays (GameplayAudio.VoiceLinePlayed sets the text) -->
+            <ui:Label text="Let&apos;s clean the air of this city!" name="hud-voice-line" class="hud-voice-line" picking-mode="Ignore"/>
+            <!-- Score and trees planted (GDD 9.3), top center -->
+            <ui:VisualElement name="hud-stats" class="hud-stats" picking-mode="Ignore">
+                <ui:Label text="0" name="hud-score" class="hud-stat hud-stat--score" picking-mode="Ignore"/>
+                <ui:Label text="TREES 0/0" name="hud-trees" class="hud-stat hud-stat--trees" picking-mode="Ignore"/>
+            </ui:VisualElement>
+            <ui:Label text="02:00" name="hud-timer" class="hud-timer" picking-mode="Ignore"/>
+            <ui:Button text="II" name="btn-pause" class="pause-button"/>
+            <!-- Camera switch (third / first person), below the pause button.
+                 GameHudController gives it the vector icon (CameraSwitchIcon) and highlights it in first person. -->
+            <ui:Button name="btn-camera" class="camera-button"/>
+        </ui:VisualElement>
+
+        <!-- Pause menu -->
+        <ui:VisualElement name="pause-overlay" class="overlay">
+            <ui:VisualElement name="pause-panel" class="panel">
+                <ui:Label text="PAUSED" class="panel-title"/>
+                <ui:Slider label="Music" name="pause-slider-music" low-value="0" high-value="1" value="0.8" class="option-slider"/>
+                <ui:Slider label="Effects" name="pause-slider-sfx" low-value="0" high-value="1" value="0.8" class="option-slider"/>
+                <ui:VisualElement class="option-row">
+                    <ui:Toggle label="Vibration" name="pause-toggle-vibration" value="true" class="option-toggle option-row__item"/>
+                    <ui:Toggle label="Fullscreen" name="pause-toggle-fullscreen" value="true" class="option-toggle option-row__item"/>
+                </ui:VisualElement>
+                <ui:Toggle label="Fixed joystick" name="pause-toggle-fixed-joystick" value="false" class="option-toggle"/>
+                <ui:Button text="RESUME" name="btn-resume" class="menu-button menu-button--primary panel-button"/>
+                <ui:VisualElement class="pause-row">
+                    <ui:Button text="RETRY" name="btn-pause-retry" class="menu-button pause-row__button pause-row__button--left"/>
+                    <ui:Button text="MENU" name="btn-pause-menu" class="menu-button menu-button--ghost pause-row__button"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="fade" class="fade" picking-mode="Ignore"/>
+    </ui:VisualElement>
+</ui:UXML>

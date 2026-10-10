@@ -1,0 +1,20 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/VerdantZero/UI/MainMenu/MainMenu.uss?fileID=7433441132597879392&amp;guid=dab1087fa4394394d9e848f95bd88bf5&amp;type=3#MainMenu"/>
+    <Style src="project://database/Assets/VerdantZero/UI/GameOver/GameOver.uss?fileID=7433441132597879392&amp;guid=a036cc5f04b34044d81a12cc41f30444&amp;type=3#GameOver"/>
+    <ui:VisualElement name="gameover-root" class="gameover-root" picking-mode="Ignore">
+        <ui:VisualElement name="gameover-overlay" class="gameover-overlay">
+            <ui:VisualElement name="gameover-panel" class="gameover-panel">
+                <ui:Label text="YOU CRASHED!" name="gameover-title" class="gameover-title"/>
+                <ui:Label text="The drone crashed into a building!" name="gameover-subtitle" class="gameover-subtitle"/>
+                <!-- Impact summary (GameOverController fills in the rows) -->
+                <ui:VisualElement name="gameover-stats" class="gameover-stats"/>
+                <ui:Label text="Tip: fly above the buildings to cross the city." name="gameover-hint" class="gameover-hint"/>
+                <ui:VisualElement class="button-column">
+                    <ui:Button text="RETRY" name="btn-retry" class="menu-button menu-button--primary"/>
+                    <ui:Button text="MAIN MENU" name="btn-menu" class="menu-button"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="fade" class="fade" picking-mode="Ignore"/>
+    </ui:VisualElement>
+</ui:UXML>

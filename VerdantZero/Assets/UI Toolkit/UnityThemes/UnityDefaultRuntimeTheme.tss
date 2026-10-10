@@ -1,0 +1,9 @@
+@import url("unity-theme://default");
+
+/* Rounded, readable typography for the whole game (GDD 10): Fredoka (SIL OFL 1.1).
+   The Regular Font Asset has the Bold variant in its weight table, so -unity-font-style: bold uses Fredoka Bold. */
+:root {
+    -unity-font-definition: url("project://database/Assets/VerdantZero/Fonts/Fredoka-Regular%20SDF.asset");
+    /* The advanced text generator applies Fredoka's kerning badly (the V overlaps the previous letter); the standard one does not */
+    -unity-text-generator: standard;
+}

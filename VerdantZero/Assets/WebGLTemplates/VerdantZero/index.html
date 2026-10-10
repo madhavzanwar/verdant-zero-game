@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0e1c26">
+    <title>{{{ PRODUCT_NAME }}}</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #0e1c26;
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      #game {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        background: #0e1c26;
+      }
+      #unity-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: #0e1c26;
+        outline: none;
+      }
+      #loading {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        color: #78e6aa;
+        background: radial-gradient(circle at 50% 40%, #173a3a 0%, #0e1c26 70%);
+      }
+      #loading h1 {
+        margin: 0;
+        font-size: clamp(32px, 7vw, 72px);
+        letter-spacing: 0.08em;
+        color: #c8e6d2;
+        text-shadow: 0 4px 0 #0a1410;
+      }
+      #loading h1 span { color: #78ffbe; }
+      #loading p { margin: 0; font-size: clamp(14px, 2.4vw, 20px); color: #e8efe8; opacity: 0.85; }
+      #progress {
+        width: min(420px, 70vw);
+        height: 14px;
+        border: 2px solid #78e6aa;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #78ffbe, #1aa8c4); }
+      #fullscreen-button {
+        position: absolute;
+        right: 12px;
+        bottom: 12px;
+        width: 44px;
+        height: 44px;
+        border: 2px solid rgba(120, 230, 170, 0.8);
+        border-radius: 12px;
+        background: rgba(14, 28, 38, 0.6);
+        color: #78e6aa;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        display: none;
+      }
+      #warning {
+        position: absolute;
+        left: 50%;
+        top: 5%;
+        transform: translateX(-50%);
+        display: none;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game">
+      <canvas id="unity-canvas" tabindex="-1"></canvas>
+      <div id="loading">
+        <h1>VERDANT <span>ZERO</span></h1>
+        <p>Purify. Reforest. Save the City.</p>
+        <div id="progress"><div id="progress-fill"></div></div>
+        <p id="loading-text">Loading...</p>
+      </div>
+      <button id="fullscreen-button" title="Toggle fullscreen" aria-label="Toggle fullscreen">&#x26F6;</button>
+      <div id="warning"></div>
+    </div>
+    <script>
+      var container = document.querySelector("#game");
+      var canvas = document.querySelector("#unity-canvas");
+      var loading = document.querySelector("#loading");
+      var progressFill = document.querySelector("#progress-fill");
+      var loadingText = document.querySelector("#loading-text");
+      var fullscreenButton = document.querySelector("#fullscreen-button");
+      var warningBanner = document.querySelector("#warning");
+
+      // ---------- Fullscreen ----------
+      // The game fills the whole browser window at all times. Real (browser) fullscreen needs a user
+      // gesture, so it is requested on the first click / tap / key press, and whenever the game's
+      // Fullscreen option asks for it (window.verdantZeroFullscreen, called from BrowserInput.jslib).
+      var wantsFullscreen = true;
+      try { wantsFullscreen = localStorage.getItem("verdantZero.fullscreen") !== "0"; } catch (e) {}
+
+      function isFullscreen() {
+        return !!(document.fullscreenElement || document.webkitFullscreenElement);
+      }
+      function canFullscreen() {
+        return !!(container.requestFullscreen || container.webkitRequestFullscreen);
+      }
+      // True while a fullscreen request is waiting for a user gesture
+      var pendingEnter = wantsFullscreen;
+
+      function enterFullscreen() {
+        if (isFullscreen() || !canFullscreen()) { pendingEnter = false; return; }
+        try {
+          var p = (container.requestFullscreen || container.webkitRequestFullscreen).call(container, { navigationUI: "hide" });
+          if (p && p.then) {
+            p.then(function () {
+              pendingEnter = false;
+              // Phones: keep the game in landscape while in fullscreen
+              if (screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").catch(function () {});
+            }).catch(function () { pendingEnter = true; });
+          } else {
+            pendingEnter = false;
+          }
+        } catch (e) { pendingEnter = true; }
+      }
+      function exitFullscreen() {
+        if (!isFullscreen()) return;
+        var exit = document.exitFullscreen || document.webkitExitFullscreen;
+        try { var p = exit.call(document); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+      }
+      window.verdantZeroFullscreen = function (on) {
+        wantsFullscreen = on;
+        try { localStorage.setItem("verdantZero.fullscreen", on ? "1" : "0"); } catch (e) {}
+        pendingEnter = on;
+        if (on) enterFullscreen(); else exitFullscreen();
+      };
+      // Only the first interaction (or a request from the Options toggle) enters fullscreen, so
+      // leaving it with Esc is always respected.
+      function onUserGesture(e) {
+        if (e.type === "keydown" && e.key === "Escape") return;
+        if (pendingEnter && wantsFullscreen) enterFullscreen();
+      }
+      ["pointerup", "touchend", "keydown"].forEach(function (type) {
+        window.addEventListener(type, onUserGesture, true);
+      });
+      fullscreenButton.addEventListener("click", function (e) {
+        e.stopPropagation();
+        window.verdantZeroFullscreen(!isFullscreen());
+      });
+      function updateButton() {
+        fullscreenButton.innerHTML = isFullscreen() ? "&#x2715;" : "&#x26F6;";
+        fullscreenButton.style.display = canFullscreen() && !isFullscreen() ? "block" : "none";
+      }
+      document.addEventListener("fullscreenchange", updateButton);
+      document.addEventListener("webkitfullscreenchange", updateButton);
+
+      // ---------- Warnings ----------
+      function unityShowBanner(msg, type) {
+        var div = document.createElement("div");
+        div.innerHTML = msg;
+        div.style.padding = "10px";
+        div.style.background = type == "error" ? "#c0392b" : "#e6b422";
+        div.style.color = type == "error" ? "#fff" : "#000";
+        warningBanner.appendChild(div);
+        warningBanner.style.display = "block";
+        if (type != "error") setTimeout(function () {
+          warningBanner.removeChild(div);
+          if (!warningBanner.children.length) warningBanner.style.display = "none";
+        }, 5000);
+      }
+
+      // ---------- Unity loader ----------
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+        frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+#if USE_THREADS
+        workerUrl: buildUrl + "/{{{ WORKER_FILENAME }}}",
+#endif
+#if USE_WASM
+        codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+#endif
+#if MEMORY_FILENAME
+        memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+        symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+#endif
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+        productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+        productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+        // The canvas follows the window size; cap the pixel ratio so phones stay smooth
+        matchWebGLToCanvasSize: true,
+        devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+        showBanner: unityShowBanner,
+      };
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = function () {
+        createUnityInstance(canvas, config, function (progress) {
+          var pct = Math.round(100 * progress);
+          progressFill.style.width = pct + "%";
+          loadingText.textContent = "Loading... " + pct + "%";
+        }).then(function (unityInstance) {
+          loading.style.display = "none";
+          updateButton();
+          canvas.focus();
+        }).catch(function (message) {
+          alert(message);
+        });
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>

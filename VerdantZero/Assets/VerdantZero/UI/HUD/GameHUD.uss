@@ -1,0 +1,647 @@
+/* Gameplay HUD: touch joysticks, pause button and pause menu.
+   Reference resolution 1920x1080 (PanelSettings, Expand). */
+
+.game-hud-root {
+    flex-grow: 1;
+}
+
+.game-hud-safe-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* ---------- Beam crosshair ---------- */
+
+.crosshair {
+    position: absolute;
+    width: 92px;
+    height: 92px;
+    translate: -50% -50%;
+    transition-property: scale;
+    transition-duration: 0.12s;
+}
+
+/* Each corner is a square with only two visible borders (an L shape) */
+.crosshair__corner {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-color: rgba(255, 255, 255, 0.9);
+    transition-property: border-color;
+    transition-duration: 0.12s;
+}
+
+.crosshair__corner--tl {
+    left: 0;
+    top: 0;
+    border-left-width: 5px;
+    border-top-width: 5px;
+}
+
+.crosshair__corner--tr {
+    right: 0;
+    top: 0;
+    border-right-width: 5px;
+    border-top-width: 5px;
+}
+
+.crosshair__corner--bl {
+    left: 0;
+    bottom: 0;
+    border-left-width: 5px;
+    border-bottom-width: 5px;
+}
+
+.crosshair__corner--br {
+    right: 0;
+    bottom: 0;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+}
+
+/* Outline: the same corners, slightly thicker and larger, dark and behind */
+.crosshair__corner--outline {
+    width: 34px;
+    height: 34px;
+    margin: -4px;
+    border-color: rgba(10, 20, 28, 0.75);
+}
+
+.crosshair__corner--outline.crosshair__corner--tl {
+    border-left-width: 13px;
+    border-top-width: 13px;
+}
+
+.crosshair__corner--outline.crosshair__corner--tr {
+    border-right-width: 13px;
+    border-top-width: 13px;
+}
+
+.crosshair__corner--outline.crosshair__corner--bl {
+    border-left-width: 13px;
+    border-bottom-width: 13px;
+}
+
+.crosshair__corner--outline.crosshair__corner--br {
+    border-right-width: 13px;
+    border-bottom-width: 13px;
+}
+
+/* Locked cloud: the corners turn cyan and close in on the target */
+.crosshair--locked {
+    scale: 0.8 0.8;
+}
+
+.crosshair--locked .crosshair__corner {
+    border-color: rgb(120, 220, 255);
+}
+
+.crosshair--locked .crosshair__corner--outline {
+    border-color: rgba(10, 20, 28, 0.75);
+}
+
+/* ---------- Cloud markers (a target over each cloud) ---------- */
+
+.cloud-markers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.cloud-marker {
+    position: absolute;
+    align-items: center;
+    /* left/top is the marker's bottom tip, right above the cloud */
+    translate: -50% -100%;
+    transform-origin: 50% 100%;
+}
+
+.cloud-marker__ring {
+    width: 84px;
+    height: 84px;
+    border-radius: 42px;
+    border-width: 9px;
+    border-color: rgb(255, 196, 60);
+    background-color: rgba(60, 50, 20, 0.35);
+    align-items: center;
+    justify-content: center;
+}
+
+.cloud-marker__dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    background-color: rgb(255, 196, 60);
+}
+
+.cloud-marker__label {
+    display: none;
+    margin-top: 6px;
+    padding: 2px 12px;
+    font-size: 24px;
+    -unity-font-style: bold;
+    color: rgb(14, 28, 38);
+    background-color: rgb(120, 220, 255);
+    border-radius: 10px;
+}
+
+/* Micro-clouds: smaller target */
+.cloud-marker--micro .cloud-marker__ring {
+    width: 52px;
+    height: 52px;
+    border-radius: 26px;
+    border-width: 6px;
+}
+
+.cloud-marker--micro .cloud-marker__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+}
+
+/* In the Beam's sights: cyan, larger and with a prompt */
+.cloud-marker--target .cloud-marker__ring {
+    border-color: rgb(120, 220, 255);
+    background-color: rgba(20, 120, 200, 0.45);
+    scale: 1.25 1.25;
+}
+
+.cloud-marker--target .cloud-marker__dot {
+    background-color: rgb(120, 220, 255);
+}
+
+.cloud-marker--target .cloud-marker__label {
+    display: flex;
+}
+
+/* Planting spots: green diamond (leaf) instead of a target */
+.spot-marker .cloud-marker__ring {
+    border-color: rgb(140, 235, 110);
+    background-color: rgba(30, 80, 30, 0.35);
+    border-radius: 12px;
+    rotate: 45deg;
+}
+
+.spot-marker .cloud-marker__dot {
+    background-color: rgb(140, 235, 110);
+    border-radius: 3px;
+}
+
+.spot-marker .cloud-marker__label {
+    background-color: rgb(140, 235, 110);
+}
+
+.spot-marker.cloud-marker--target .cloud-marker__ring {
+    border-color: rgb(200, 255, 170);
+    background-color: rgba(60, 160, 60, 0.55);
+    scale: 1.25 1.25;
+}
+
+/* ---------- Joysticks ---------- */
+
+.touch-controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.touch-zone {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 42%;
+    height: 62%;
+}
+
+/* Joystick hidden on desktop web (GameHudController) */
+.touch-zone--hidden {
+    display: none;
+}
+
+.joystick {
+    flex-grow: 1;
+}
+
+.joystick__base {
+    position: absolute;
+    width: 240px;
+    height: 240px;
+    /* The position (left/top) is the center: offset with translate */
+    translate: -50% -50%;
+    border-radius: 120px;
+    border-width: 4px;
+    border-color: rgba(225, 235, 230, 0.45);
+    background-color: rgba(14, 28, 38, 0.28);
+    align-items: center;
+    justify-content: center;
+    opacity: 0.55;
+    transition-property: opacity;
+    transition-duration: 0.15s;
+}
+
+.joystick__knob {
+    width: 104px;
+    height: 104px;
+    border-radius: 52px;
+    background-color: rgba(225, 235, 230, 0.8);
+    border-width: 3px;
+    border-color: rgba(14, 28, 38, 0.35);
+}
+
+.joystick--active .joystick__base {
+    opacity: 1;
+}
+
+.joystick--move .joystick__knob {
+    background-color: rgba(120, 230, 170, 0.85);
+}
+
+
+/* ---------- Pause button ---------- */
+
+.pause-button {
+    position: absolute;
+    top: 28px;
+    right: 36px;
+    width: 128px;
+    height: 128px;
+    margin: 0;
+    padding: 0;
+    font-size: 40px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(225, 235, 230);
+    background-color: rgba(14, 28, 38, 0.72);
+    border-width: 3px;
+    border-color: rgba(120, 230, 170, 0.6);
+    border-radius: 24px;
+    transition-property: background-color, scale;
+    transition-duration: 0.12s;
+}
+
+.pause-button:hover,
+.pause-button:focus {
+    background-color: rgba(44, 102, 104, 0.9);
+}
+
+.pause-button:active {
+    scale: 0.92 0.92;
+}
+
+/* ---------- Camera button (below pause, same look) ---------- */
+
+.camera-button {
+    position: absolute;
+    top: 172px;
+    right: 36px;
+    width: 128px;
+    height: 128px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(14, 28, 38, 0.72);
+    border-width: 3px;
+    border-color: rgba(120, 230, 170, 0.6);
+    border-radius: 24px;
+    transition-property: background-color, scale;
+    transition-duration: 0.12s;
+}
+
+.camera-button:hover {
+    background-color: rgba(44, 102, 104, 0.9);
+}
+
+.camera-button:active {
+    scale: 0.92 0.92;
+}
+
+/* In first person the button stays highlighted (the icon turns the accent green) */
+.camera-button--first-person {
+    border-color: rgb(120, 230, 170);
+}
+
+.camera-button__icon {
+    width: 88px;
+    height: 88px;
+}
+
+/* ---------- Action buttons (GDD 9.3: large, bottom right) ---------- */
+
+.action-button {
+    position: absolute;
+    right: 64px;
+    bottom: 150px;
+    width: 176px;
+    height: 176px;
+    border-radius: 88px;
+    border-width: 5px;
+    align-items: center;
+    justify-content: center;
+    transition-property: scale, background-color;
+    transition-duration: 0.08s;
+}
+
+.action-button__label {
+    font-size: 30px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    color: rgb(240, 250, 255);
+    margin: 0;
+    padding: 0;
+}
+
+.action-button--beam {
+    background-color: rgba(20, 120, 200, 0.75);
+    border-color: rgb(120, 220, 255);
+}
+
+/* Seed: above the Beam, green (GDD 6.2) */
+.action-button--seed {
+    bottom: 350px;
+    width: 150px;
+    height: 150px;
+    border-radius: 75px;
+    right: 77px;
+    background-color: rgba(60, 150, 60, 0.75);
+    border-color: rgb(170, 240, 120);
+}
+
+.action-button--seed .action-button__label {
+    font-size: 24px;
+}
+
+.action-button--seed.hud-button--pressed,
+.action-button--seed.action-button--ready.action-button--pulse {
+    background-color: rgba(110, 210, 90, 0.95);
+}
+
+.hud-button--pressed {
+    scale: 0.92 0.92;
+}
+
+/* A cloud is in the sights: the Beam button pulses (GameHudController toggles --pulse) */
+.action-button--ready {
+    border-color: rgb(255, 255, 255);
+    border-width: 7px;
+}
+
+.action-button--ready.action-button--pulse {
+    scale: 1.1 1.1;
+    background-color: rgba(60, 190, 255, 0.95);
+}
+
+.action-button--beam.hud-button--pressed {
+    background-color: rgba(60, 190, 255, 0.95);
+}
+
+/* Climb and descend: column to the left of the Beam button */
+.altitude-button {
+    position: absolute;
+    right: 290px;
+    width: 128px;
+    height: 128px;
+    border-radius: 28px;
+    border-width: 4px;
+    border-color: rgba(225, 235, 230, 0.6);
+    background-color: rgba(14, 28, 38, 0.55);
+    align-items: center;
+    justify-content: center;
+    transition-property: scale, background-color;
+    transition-duration: 0.08s;
+}
+
+.altitude-button--up {
+    bottom: 230px;
+}
+
+.altitude-button--down {
+    bottom: 80px;
+}
+
+.altitude-button__label {
+    font-size: 48px;
+    color: rgb(230, 200, 110);
+    margin: 0;
+    padding: 0;
+}
+
+.altitude-button.hud-button--pressed {
+    background-color: rgba(44, 102, 104, 0.9);
+}
+
+/* ---------- Map edge warning ---------- */
+
+.hud-boundary {
+    position: absolute;
+    top: 170px;
+    left: 50%;
+    translate: -50% 0;
+    margin: 0;
+    padding: 12px 32px;
+    font-size: 34px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(30, 20, 10);
+    background-color: rgba(255, 196, 60, 0.92);
+    border-radius: 18px;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.25s;
+}
+
+.hud-boundary--visible {
+    opacity: 1;
+}
+
+/* ---------- Voice line captions (center, while they play) ---------- */
+
+.hud-voice-line {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    translate: -50% -50%;
+    max-width: 80%;
+    margin: 0;
+    padding: 0;
+    font-size: 72px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    color: rgb(225, 235, 230);
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgba(14, 28, 38, 0.9);
+    text-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    scale: 0.9 0.9;
+    transition-property: opacity, scale;
+    transition-duration: 0.4s, 0.4s;
+}
+
+.hud-voice-line--visible {
+    opacity: 1;
+    scale: 1 1;
+}
+
+/* ---------- Timer (left of the pause button) ---------- */
+
+.hud-timer {
+    position: absolute;
+    top: 28px;
+    right: 180px;
+    height: 128px;
+    min-width: 200px;
+    margin: 0;
+    padding: 0 28px;
+    font-size: 52px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    letter-spacing: 2px;
+    color: rgb(225, 235, 230);
+    background-color: rgba(14, 28, 38, 0.72);
+    border-width: 3px;
+    border-color: rgba(120, 230, 170, 0.6);
+    border-radius: 24px;
+}
+
+/* ---------- Score and trees (top center) ---------- */
+
+/* Centered at the top, between the smog bar (left) and the timer (right) */
+.hud-stats {
+    position: absolute;
+    top: 28px;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.hud-stat {
+    margin: 0 8px;
+    padding: 6px 24px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    color: rgb(225, 235, 230);
+    background-color: rgba(14, 28, 38, 0.72);
+    border-width: 3px;
+    border-color: rgba(120, 230, 170, 0.6);
+    border-radius: 20px;
+    transition-property: scale;
+    transition-duration: 0.15s;
+}
+
+.hud-stat--score {
+    font-size: 40px;
+    letter-spacing: 2px;
+}
+
+.hud-stat--trees {
+    font-size: 28px;
+    color: rgb(150, 235, 140);
+}
+
+/* Pulses briefly when scoring points or planting */
+.hud-stat--bump {
+    scale: 1.12 1.12;
+}
+
+.hud-timer--warning {
+    color: rgb(240, 95, 85);
+    border-color: rgba(235, 90, 80, 0.85);
+}
+
+/* ---------- Pause menu ---------- */
+
+.pause-row {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.pause-row__button {
+    flex-grow: 1;
+    flex-basis: 0;
+    font-size: 32px;
+}
+
+.pause-row__button--left {
+    margin-right: 16px;
+}
+
+/* ---------- First-run tutorial (TutorialController) ---------- */
+
+.tutorial-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(5, 12, 16, 0.55);
+}
+
+/* Pulsing ring around the control the card talks about */
+.tutorial-ring {
+    position: absolute;
+    border-width: 8px;
+    border-color: rgb(255, 214, 102);
+    border-radius: 40px;
+    transition-property: scale, opacity;
+    transition-duration: 0.4s;
+}
+
+.tutorial-ring--pulse {
+    scale: 1.08 1.08;
+    opacity: 0.55;
+}
+
+.tutorial-card {
+    width: 100%;
+    max-width: 820px;
+    padding: 32px 48px;
+    background-color: rgb(20, 40, 50);
+    border-width: 4px;
+    border-color: rgb(255, 214, 102);
+    border-radius: 32px;
+}
+
+.tutorial-card__counter {
+    font-size: 26px;
+    color: rgb(185, 205, 210);
+    -unity-text-align: middle-center;
+}
+
+.tutorial-card__title {
+    font-size: 60px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(255, 214, 102);
+    margin: 4px 0 12px 0;
+}
+
+.tutorial-card__body {
+    font-size: 36px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    color: rgb(240, 245, 245);
+    margin-bottom: 20px;
+}
+
+.tutorial-card__row {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.tutorial-card__button {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin: 0 8px;
+}
