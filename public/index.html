@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Verdant Zero - Arcade Eco Drone Flight</title>
+  <link rel="icon" type="image/png" href="/unity-assets/UI/MainMenu/Art/menu_flare.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "/vendor/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <!-- 3D Canvas Viewport -->
+    <div id="canvas-container">
+      <canvas id="three-canvas"></canvas>
+    </div>
+
+    <!-- MAIN MENU -->
+    <div id="main-menu">
+      <div class="menu-stage">
+        <div class="bg-base"></div>
+        <div class="bg-smoke-container" id="bg-smoke">
+          <div class="bg-smoke-puff" style="left: 31%; top: 26%;"></div>
+          <div class="bg-smoke-puff" style="left: 49%; top: 27%; animation-delay: 1.5s;"></div>
+          <div class="bg-smoke-puff" style="left: 59%; top: 27%; animation-delay: 3s;"></div>
+          <div class="bg-smoke-puff" style="left: 65%; top: 26%; animation-delay: 4.5s;"></div>
+        </div>
+        <div class="bg-beam"></div>
+        <div class="bg-impact"></div>
+        <div class="bg-drone"></div>
+        <div class="bg-logo-glow"></div>
+        <div class="bg-logo"></div>
+      </div>
+
+      <div class="menu-content">
+        <div class="button-column">
+          <button class="menu-button menu-button--primary" id="btn-play">PLAY</button>
+          <button class="menu-button" id="btn-options">OPTIONS</button>
+          <button class="menu-button" id="btn-tutorial-menu">HOW TO PLAY</button>
+          <button class="menu-button menu-button--ghost" id="btn-credits">CREDITS</button>
+        </div>
+      </div>
+
+      <div class="menu-footer">
+        <span class="version-badge">v0.1 · Unity 6 & Three.js Engine</span>
+      </div>
+    </div>
+
+    <!-- LEVEL SELECT OVERLAY -->
+    <div class="overlay" id="overlay-levels">
+      <div class="panel">
+        <h2 class="panel-title">SELECT MISSION</h2>
+        <div class="levels-grid">
+          <div class="level-card selected" data-level="Downtown">
+            <div class="level-card-info">
+              <h3>1 · Downtown District</h3>
+              <p>Purify dense city smog & reforest rooftop planters</p>
+            </div>
+            <div class="level-card-badge">ACTIVE</div>
+          </div>
+          <div class="level-card" data-level="Industrial">
+            <div class="level-card-info">
+              <h3>2 · Industrial Belt</h3>
+              <p>Chimney micro-smog clouds & factory air purification</p>
+            </div>
+            <div class="level-card-badge">UNLOCKED</div>
+          </div>
+          <div class="level-card" data-level="Metropolis">
+            <div class="level-card-info">
+              <h3>3 · Metropolis Heights</h3>
+              <p>High-altitude smog layers & vertical rooftop gardens</p>
+            </div>
+            <div class="level-card-badge">UNLOCKED</div>
+          </div>
+        </div>
+        <button class="menu-button menu-button--primary panel-btn-full" id="btn-start-mission">START MISSION</button>
+        <button class="menu-button menu-button--ghost panel-btn-full" id="btn-levels-back">BACK</button>
+      </div>
+    </div>
+
+    <!-- OPTIONS OVERLAY -->
+    <div class="overlay" id="overlay-options">
+      <div class="panel">
+        <h2 class="panel-title">GAME OPTIONS</h2>
+        <div class="option-group">
+          <label><span>Music Volume</span><span id="label-music-val">80%</span></label>
+          <input type="range" min="0" max="100" value="80" class="option-slider" id="slider-music">
+        </div>
+        <div class="option-group">
+          <label><span>Sound Effects Volume</span><span id="label-sfx-val">80%</span></label>
+          <input type="range" min="0" max="100" value="80" class="option-slider" id="slider-sfx">
+        </div>
+        <div class="option-row">
+          <label class="option-toggle">
+            <span>Fullscreen</span>
+            <input type="checkbox" id="toggle-fullscreen" checked>
+          </label>
+          <label class="option-toggle">
+            <span>Vibration</span>
+            <input type="checkbox" id="toggle-vibration" checked>
+          </label>
+        </div>
+        <div class="option-group">
+          <label><span>Mission Difficulty</span></label>
+          <div class="difficulty-select">
+            <button class="difficulty-btn" data-diff="EASY">EASY</button>
+            <button class="difficulty-btn active" data-diff="NORMAL">NORMAL</button>
+            <button class="difficulty-btn" data-diff="HARD">HARD</button>
+          </div>
+        </div>
+        <button class="menu-button menu-button--primary panel-btn-full" id="btn-options-back">APPLY & BACK</button>
+      </div>
+    </div>
+
+    <!-- CREDITS OVERLAY -->
+    <div class="overlay" id="overlay-credits">
+      <div class="panel">
+        <h2 class="panel-title">CREDITS & ATTRIBUTIONS</h2>
+        <div class="credits-scroll">
+          <div class="credits-heading">Design and Development</div>
+          <div class="credits-line">The Verdant Zero Team & Madhav Zanwar</div>
+          <div class="credits-heading">Verdant-1 Eco Drone</div>
+          <div class="credits-line">Original 3D Model sculpted in Blender, optimized for real-time physics</div>
+          <div class="credits-heading">City Environment</div>
+          <div class="credits-line">POLYGON City Pack & Procedural City Grid Architecture</div>
+          <div class="credits-heading">Skyboxes & Atmosphere</div>
+          <div class="credits-line">Kloofendal Overcast Pure Sky and Spruit Sunrise, Poly Haven (CC0)</div>
+          <div class="credits-heading">Audio & Sound FX</div>
+          <div class="credits-line">Synthesized eco-drone soundscape, procedural motor Doppler, ambient city audio</div>
+          <div class="credits-heading">Typography</div>
+          <div class="credits-line">Fredoka (SIL Open Font License 1.1) & Chakra Petch</div>
+          <div class="credits-heading">Engine & Pipeline</div>
+          <div class="credits-line">Unity 6 Universal Render Pipeline (URP) & Three.js Web Companion</div>
+        </div>
+        <button class="menu-button menu-button--primary panel-btn-full" id="btn-credits-back">BACK</button>
+      </div>
+    </div>
+
+    <!-- TUTORIAL OVERLAY -->
+    <div class="overlay" id="overlay-tutorial">
+      <div class="panel tutorial-card">
+        <div class="tutorial-card-step" id="tut-step">STEP 1 OF 5</div>
+        <h2 class="tutorial-card-title" id="tut-title">Hello, Pilot!</h2>
+        <p class="tutorial-card-body" id="tut-body">The city is engulfed in toxic smog. Your drone Verdant-1 is equipped to purify the air and reforest the city before time runs out.</p>
+        <div class="tutorial-buttons">
+          <button class="menu-button menu-button--ghost" id="btn-tut-skip">SKIP</button>
+          <button class="menu-button menu-button--primary" id="btn-tut-next">NEXT</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- IN-GAME HUD (Faithful 1:1 replica of Unity 6 UI Toolkit: GameHUD.uxml & SmogMeter.uxml) -->
+    <div id="game-hud" class="game-hud-root">
+      <div class="game-hud-safe-area">
+        <!-- Smog Meter (Top Left - matching SmogMeter.uxml) -->
+        <div class="smog-meter" id="smog-meter">
+          <div class="smog-meter__header">
+            <span class="smog-meter__title">SMOG</span>
+            <span class="smog-meter__value" id="hud-smog-val">50%</span>
+          </div>
+          <div class="smog-meter__track">
+            <div class="smog-meter__fill" id="hud-smog-fill" style="width: 50%;"></div>
+          </div>
+        </div>
+
+        <!-- Center Stats (Top Center - matching GameHUD.uxml hud-stats) -->
+        <div class="hud-stats">
+          <div class="hud-stat hud-stat--score" id="hud-score">0</div>
+          <div class="hud-stat hud-stat--trees" id="hud-trees">TREES 0/18</div>
+        </div>
+
+        <!-- Timer (Top Right - matching GameHUD.uxml hud-timer) -->
+        <div class="hud-timer" id="hud-timer">02:00</div>
+
+        <!-- Pause Button (Top Right Corner - matching GameHUD.uxml btn-pause) -->
+        <button class="pause-button" id="btn-pause-toggle" title="Pause (Esc)">II</button>
+
+        <!-- Camera Button (Below Pause Button - matching GameHUD.uxml btn-camera with CameraSwitchIcon) -->
+        <button class="camera-button" id="btn-cam-toggle" title="Switch View (V)">
+          <svg class="camera-button__icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 15L19 12H25L27 15H30C31.6569 15 33 16.3431 33 18V28C33 29.6569 31.6569 31 30 31H14C12.3431 31 11 29.6569 11 28V18C11 16.3431 12.3431 15 14 15H17Z" fill="currentColor"/>
+            <circle cx="22" cy="22.5" r="5" fill="#0e1c26"/>
+            <circle cx="22" cy="22.5" r="2.6" fill="currentColor"/>
+            <path d="M7 22C7 13.7157 13.7157 7 22 7C25.5 7 28.7 8.2 31.2 10.3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            <polygon points="31,6 34,12 27,12" fill="currentColor"/>
+            <path d="M37 22C37 30.2843 30.2843 37 22 37C18.5 37 15.3 35.8 12.8 33.7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            <polygon points="13,38 10,32 17,32" fill="currentColor"/>
+          </svg>
+        </button>
+
+        <!-- Aiming Crosshair (GameHUD.uxml crosshair) -->
+        <div class="crosshair" id="crosshair">
+          <div class="crosshair__corner crosshair__corner--outline crosshair__corner--tl"></div>
+          <div class="crosshair__corner crosshair__corner--outline crosshair__corner--tr"></div>
+          <div class="crosshair__corner crosshair__corner--outline crosshair__corner--bl"></div>
+          <div class="crosshair__corner crosshair__corner--outline crosshair__corner--br"></div>
+          <div class="crosshair__corner crosshair__corner--tl"></div>
+          <div class="crosshair__corner crosshair__corner--tr"></div>
+          <div class="crosshair__corner crosshair__corner--bl"></div>
+          <div class="crosshair__corner crosshair__corner--br"></div>
+        </div>
+
+        <!-- Voice Line Toast (GameHUD.uxml hud-voice-line) -->
+        <div class="hud-voice-line" id="hud-voice-line">
+          Let's clean the air of this city!
+        </div>
+
+        <!-- Out-of-Bounds Warning (GameHUD.uxml hud-boundary) -->
+        <div class="hud-boundary" id="hud-boundary">
+          OUT OF RANGE · RETURN TO THE CITY
+        </div>
+
+        <!-- Touch Controls (Mobile Only - Hidden on Desktop per GameHUD.uss) -->
+        <div class="touch-controls" id="touch-controls">
+          <div class="touch-zone touch-zone--left" id="touch-joystick">
+            <div class="joystick__base">
+              <div class="joystick__knob" id="touch-knob"></div>
+            </div>
+          </div>
+          <div class="touch-zone touch-zone--right">
+            <button class="altitude-button altitude-button--up" id="btn-touch-up">
+              <span class="altitude-button__label">▲</span>
+            </button>
+            <button class="altitude-button altitude-button--down" id="btn-touch-down">
+              <span class="altitude-button__label">▼</span>
+            </button>
+            <button class="action-button action-button--seed" id="btn-touch-seed">
+              <span class="action-button__label">SEED</span>
+            </button>
+            <button class="action-button action-button--beam" id="btn-touch-beam">
+              <span class="action-button__label">BEAM</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAUSE MENU OVERLAY -->
+    <div class="overlay" id="overlay-pause">
+      <div class="panel">
+        <h2 class="panel-title">MISSION PAUSED</h2>
+        <button class="menu-button menu-button--primary panel-btn-full" id="btn-resume">RESUME</button>
+        <button class="menu-button panel-btn-full" id="btn-retry">RETRY LEVEL</button>
+        <button class="menu-button panel-btn-full" id="btn-pause-options">OPTIONS</button>
+        <button class="menu-button menu-button--ghost panel-btn-full" id="btn-pause-menu">MAIN MENU</button>
+      </div>
+    </div>
+
+    <!-- GAME OVER / VICTORY OVERLAY -->
+    <div class="overlay" id="overlay-gameover">
+      <div class="panel" id="gameover-panel">
+        <div class="gameover-header">
+          <h2 class="gameover-title" id="gameover-title">CLEAN AIR!</h2>
+          <p class="gameover-subtitle" id="gameover-subtitle">You neutralized the smog with 00:48 to spare.</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-box-label">FINAL SCORE</div>
+            <div class="stat-box-value highlight" id="stat-score">18,450</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-label">SMOG REMOVED</div>
+            <div class="stat-box-value" id="stat-smog-removed">88%</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-label">CLOUDS PURIFIED</div>
+            <div class="stat-box-value" id="stat-clouds">24</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-label">TREES PLANTED</div>
+            <div class="stat-box-value" id="stat-trees">16/18</div>
+          </div>
+        </div>
+        <p class="gameover-hint" id="gameover-hint">Tip: Planting trees keeps cleaning the air passively every second.</p>
+        <button class="menu-button menu-button--primary panel-btn-full" id="btn-gameover-replay">PLAY AGAIN</button>
+        <button class="menu-button menu-button--ghost panel-btn-full" id="btn-gameover-menu">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/game.js"></script>
+</body>
+</html>

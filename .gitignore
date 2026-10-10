@@ -104,3 +104,16 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Node / Web dependencies
+node_modules/
+.env
+.DS_Store
+
+# WebGL build intermediate unpacked files
+unity-webgl/Build/extracted/
+unity-webgl/Build/WebGL.data.unpacked
+scripts/extracted_textures/
+scripts/dump_*.txt
+scripts/test_saved_bundle.unity3d
+

@@ -77,8 +77,6 @@
                 <ui:Label text="SELECT LEVEL" class="panel-title"/>
                 <ui:Button text="1 · VERDANT CITY DOWNTOWN" name="btn-level-1" class="menu-button menu-button--primary level-button"/>
                 <ui:Label text="" name="level-1-best" class="level-best"/>
-                <ui:Button text="2 · COMING SOON" name="btn-level-2" class="menu-button level-button"/>
-                <ui:Button text="3 · COMING SOON" name="btn-level-3" class="menu-button level-button"/>
                 <ui:Button text="BACK" name="btn-levels-back" class="menu-button menu-button--ghost panel-button"/>
             </ui:VisualElement>
         </ui:VisualElement>

@@ -1,0 +1,31 @@
+{
+  "name": "verdant-zero-game",
+  "version": "1.0.0",
+  "description": "Verdant Zero - Arcade Eco Drone Flight Action Game in Unity 6 & WebGL / Three.js Companion",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/test-suite.js",
+    "capture-screenshots": "node scripts/capture-screenshots.js",
+    "fetch-webgl": "node scripts/fetch-webgl.js"
+  },
+  "keywords": [
+    "unity",
+    "unity6",
+    "urp",
+    "threejs",
+    "game",
+    "drone",
+    "simulation",
+    "webgl",
+    "eco-game"
+  ],
+  "author": "Verdant Zero Team",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "puppeteer-core": "^25.13.0",
+    "three": "^0.186.1"
+  }
+}
