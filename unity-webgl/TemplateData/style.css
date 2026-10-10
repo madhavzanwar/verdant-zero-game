@@ -1,16 +1,241 @@
-body { padding: 0; margin: 0; background: #0e1c26; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-#unity-container { position: absolute }
-#unity-container.unity-desktop { left: 50%; top: 50%; transform: translate(-50%, -50%) }
-#unity-container.unity-mobile { position: fixed; width: 100%; height: 100% }
-#unity-canvas { background: #0e1c26; border-radius: 4px; box-shadow: 0 12px 36px rgba(0,0,0,0.6); }
-.unity-mobile #unity-canvas { width: 100%; height: 100% }
-#unity-loading-bar { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: none }
-#unity-logo { width: 154px; height: 130px; background: url('unity-logo-dark.png') no-repeat center }
-#unity-progress-bar-empty { width: 141px; height: 18px; margin-top: 10px; margin-left: 6.5px; background: url('progress-bar-empty-dark.png') no-repeat center }
-#unity-progress-bar-full { width: 0%; height: 18px; margin-top: 10px; background: url('progress-bar-full-dark.png') no-repeat center }
-#unity-footer { position: relative; margin-top: 8px; }
-.unity-mobile #unity-footer { display: none }
-#unity-logo-title-footer { float:left; width: 102px; height: 38px; background: url('unity-logo-title-footer.png') no-repeat center }
-#unity-build-title { float: right; margin-right: 10px; line-height: 38px; font-size: 16px; font-weight: 600; color: #78e6aa; letter-spacing: 1px; }
-#unity-fullscreen-button { cursor:pointer; float: right; width: 38px; height: 38px; background: url('fullscreen-button.png') no-repeat center }
-#unity-warning { position: absolute; left: 50%; top: 5%; transform: translate(-50%); background: white; padding: 10px; display: none }
+body {
+  padding: 0;
+  margin: 0;
+  background: #091218;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+#unity-container {
+  position: absolute;
+}
+
+#unity-container.unity-desktop {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#unity-container.unity-mobile {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* Top Performance Telemetry HUD */
+#hud-top-bar {
+  width: 960px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 14px;
+  box-sizing: border-box;
+  background: rgba(14, 28, 38, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(120, 230, 170, 0.25);
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 0px;
+  font-size: 13px;
+}
+
+.hud-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#fps-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(120, 230, 170, 0.3);
+  border-radius: 20px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.fps-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00FF41;
+  box-shadow: 0 0 8px #00FF41;
+  display: inline-block;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.perf-toggle-group {
+  display: inline-flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  padding: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.perf-btn {
+  background: transparent;
+  border: none;
+  color: #8fa6b2;
+  padding: 3px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.perf-btn:hover {
+  color: #ffffff;
+}
+
+.perf-btn.active {
+  background: #1e7a52;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 255, 65, 0.2);
+}
+
+.controls-hint {
+  font-size: 12px;
+  color: #a3c2cf;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.controls-hint kbd {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 11px;
+  font-family: inherit;
+  color: #78e6aa;
+}
+
+#unity-canvas {
+  background: #091218;
+  display: block;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+  outline: none;
+  cursor: default;
+}
+
+.unity-mobile #unity-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+#unity-loading-bar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  text-align: center;
+  z-index: 10;
+}
+
+#unity-logo {
+  width: 154px;
+  height: 130px;
+  background: url('unity-logo-dark.png') no-repeat center;
+  margin: 0 auto;
+}
+
+#unity-progress-bar-empty {
+  width: 160px;
+  height: 12px;
+  margin-top: 16px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(120, 230, 170, 0.4);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+#unity-progress-bar-full {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #1e7a52, #78e6aa);
+  box-shadow: 0 0 12px #78e6aa;
+  transition: width 0.2s ease;
+}
+
+#unity-footer {
+  width: 960px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  box-sizing: border-box;
+  background: rgba(14, 28, 38, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(120, 230, 170, 0.25);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.unity-mobile #unity-footer, .unity-mobile #hud-top-bar {
+  display: none;
+}
+
+#unity-logo-title-footer {
+  width: 102px;
+  height: 34px;
+  background: url('unity-logo-title-footer.png') no-repeat left center;
+  background-size: contain;
+  opacity: 0.8;
+}
+
+.footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+#unity-build-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #78e6aa;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+#unity-fullscreen-button {
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  background: url('fullscreen-button.png') no-repeat center;
+  background-size: contain;
+  opacity: 0.85;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+#unity-fullscreen-button:hover {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+#unity-warning {
+  position: absolute;
+  left: 50%;
+  top: 5%;
+  transform: translate(-50%);
+  background: rgba(20, 40, 50, 0.95);
+  border: 1px solid #78e6aa;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 6px;
+  display: none;
+  z-index: 100;
+}

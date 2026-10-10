@@ -3,35 +3,84 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity Web Player | Verdant Zero</title>
+    <title>Verdant Zero | Eco Drone Flight Simulator</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+      <!-- Top High-Performance HUD Bar -->
+      <div id="hud-top-bar">
+        <div class="hud-group">
+          <div id="fps-badge">
+            <span id="fps-indicator" class="fps-dot"></span>
+            <span id="fps-value">60 FPS</span>
+            <span style="opacity:0.4;">|</span>
+            <span id="frametime-value">16.6ms</span>
+          </div>
+          <div class="perf-toggle-group">
+            <button id="btn-perf-turbo" class="perf-btn active" title="1.0x Scale - Maximum 60+ FPS & Ultra-Responsive Flight">⚡ Turbo 60 FPS</button>
+            <button id="btn-perf-balanced" class="perf-btn" title="1.25x Scale - Balanced Crispness and Speed">🎨 Balanced</button>
+            <button id="btn-perf-native" class="perf-btn" title="Native Display DPI - High Definition">💎 Ultra HD</button>
+          </div>
+        </div>
+        <div class="hud-group controls-hint">
+          <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Fly</span>
+          <span>•</span>
+          <span><kbd>Space</kbd>/<kbd>Shift</kbd> Alt</span>
+          <span>•</span>
+          <span><kbd>L-Click</kbd> Beam</span>
+          <span>•</span>
+          <span><kbd>R-Click</kbd> Seed</span>
+          <span>•</span>
+          <span><kbd>V</kbd> FPV</span>
+        </div>
+      </div>
+
+      <!-- Unity WebGL Canvas -->
+      <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
+
+      <!-- Loading Bar -->
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
           <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-      <div id="unity-warning"> </div>
+
+      <div id="unity-warning"></div>
+
+      <!-- Footer Bar -->
       <div id="unity-footer">
         <div id="unity-logo-title-footer"></div>
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">Verdant Zero</div>
+        <div class="footer-meta">
+          <div id="unity-build-title">Verdant Zero • 60 FPS Optimized</div>
+          <div id="unity-fullscreen-button" title="Toggle Fullscreen"></div>
+        </div>
       </div>
     </div>
+
     <script>
       var canvas = document.querySelector("#unity-canvas");
+      var unityInstanceRef = null;
 
-      // Shows a temporary message banner/ribbon for a few seconds, or
-      // a permanent error message on top of the canvas if type=='error'.
-      // If type=='warning', a yellow highlight color is used.
-      // Modify or remove this function to customize the visually presented
-      // way that non-critical warnings and error messages are presented to the
-      // user.
+      // Base canvas dimensions
+      var baseWidth = 960;
+      var baseHeight = 600;
+
+      // Default to 1.0 DPR for rock-solid 60+ FPS and zero lag on high-DPI monitors
+      var currentDpr = 1.0;
+
+      function updateCanvasResolution(dpr) {
+        currentDpr = dpr;
+        if (!document.fullscreenElement) {
+          canvas.style.width = baseWidth + "px";
+          canvas.style.height = baseHeight + "px";
+          canvas.width = Math.round(baseWidth * currentDpr);
+          canvas.height = Math.round(baseHeight * currentDpr);
+        }
+      }
+
       function unityShowBanner(msg, type) {
         var warningBanner = document.querySelector("#unity-warning");
         function updateBannerVisibility() {
@@ -40,9 +89,9 @@
         var div = document.createElement('div');
         div.innerHTML = msg;
         warningBanner.appendChild(div);
-        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        if (type == 'error') div.style = 'background: #990000; padding: 10px;';
         else {
-          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          if (type == 'warning') div.style = 'background: #997700; padding: 10px;';
           setTimeout(function() {
             warningBanner.removeChild(div);
             updateBannerVisibility();
@@ -63,49 +112,26 @@
         productName: "Verdant Zero",
         productVersion: "0.1.0",
         showBanner: unityShowBanner,
-        // errorHandler: function(err, url, line) {
-        //    alert("error " + err + " occurred at line " + line);
-        //    // Return 'true' if you handled this error and don't want Unity
-        //    // to process it further, 'false' otherwise.
-        //    return true;
-        // },
+        devicePixelRatio: currentDpr,
+        matchWebGLToCanvasSize: false,
+        webglContextAttributes: {
+          preserveDrawingBuffer: false,
+          powerPreference: 2, // High-performance discrete GPU
+          antialias: false,   // Eliminates costly software MSAA resolves
+          desynchronized: true
+        }
       };
 
-      // By default, Unity keeps WebGL canvas render target size matched with
-      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-      // Set this to false if you want to decouple this synchronization from
-      // happening inside the engine, and you would instead like to size up
-      // the canvas DOM size and WebGL render target sizes yourself.
-      // config.matchWebGLToCanvasSize = false;
-
-      // If you would like all file writes inside Unity Application.persistentDataPath
-      // directory to automatically persist so that the contents are remembered when
-      // the user revisits the site the next time, uncomment the following line:
-      // config.autoSyncPersistentDataPath = true;
-      // This autosyncing is currently not the default behavior to avoid regressing
-      // existing user projects that might rely on the earlier manual
-      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
-      // expected to change.
-
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
-
         var meta = document.createElement('meta');
         meta.name = 'viewport';
         meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
         document.getElementsByTagName('head')[0].appendChild(meta);
         document.querySelector("#unity-container").className = "unity-mobile";
         canvas.className = "unity-mobile";
-
-        // To lower canvas resolution on mobile devices to gain some
-        // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
-
-
+        config.devicePixelRatio = 1.0;
       } else {
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
+        updateCanvasResolution(1.0);
       }
 
       document.querySelector("#unity-loading-bar").style.display = "block";
@@ -115,19 +141,91 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-              }).then((unityInstance) => {
-                document.querySelector("#unity-loading-bar").style.display = "none";
-                document.querySelector("#unity-fullscreen-button").onclick = () => {
-                  unityInstance.SetFullscreen(1);
-                };
-
-              }).catch((message) => {
-                alert(message);
-              });
-            };
-
+        }).then((unityInstance) => {
+          unityInstanceRef = unityInstance;
+          document.querySelector("#unity-loading-bar").style.display = "none";
+          document.querySelector("#unity-fullscreen-button").onclick = () => {
+            unityInstance.SetFullscreen(1);
+          };
+          // Automatically focus canvas so keyboard controls respond instantly
+          setTimeout(() => { canvas.focus(); }, 500);
+        }).catch((message) => {
+          alert(message);
+        });
+      };
       document.body.appendChild(script);
 
+      // --- Performance Preset Buttons ---
+      const btnTurbo = document.getElementById('btn-perf-turbo');
+      const btnBalanced = document.getElementById('btn-perf-balanced');
+      const btnNative = document.getElementById('btn-perf-native');
+
+      function setPreset(btn, dpr) {
+        document.querySelectorAll('.perf-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateCanvasResolution(dpr);
+        canvas.focus();
+      }
+
+      btnTurbo.addEventListener('click', () => setPreset(btnTurbo, 1.0));
+      btnBalanced.addEventListener('click', () => setPreset(btnBalanced, 1.25));
+      btnNative.addEventListener('click', () => setPreset(btnNative, Math.min(window.devicePixelRatio || 1.0, 2.0)));
+
+      // --- Real-time FPS & Frame-Time Telemetry Monitor ---
+      let frameCount = 0;
+      let lastFpsUpdate = performance.now();
+      let lastFrameTime = performance.now();
+      let frameTimeAccum = 0;
+
+      function fpsLoop(now) {
+        frameCount++;
+        const delta = now - lastFrameTime;
+        lastFrameTime = now;
+        frameTimeAccum += delta;
+
+        if (now - lastFpsUpdate >= 500) {
+          const fps = Math.round((frameCount * 1000) / (now - lastFpsUpdate));
+          const avgMs = (frameTimeAccum / frameCount).toFixed(1);
+          const fpsValEl = document.getElementById('fps-value');
+          const msValEl = document.getElementById('frametime-value');
+          const dotEl = document.getElementById('fps-indicator');
+          if (fpsValEl) fpsValEl.textContent = fps + ' FPS';
+          if (msValEl) msValEl.textContent = avgMs + 'ms';
+          if (dotEl) {
+            if (fps >= 55) {
+              dotEl.style.backgroundColor = '#00FF41';
+              dotEl.style.boxShadow = '0 0 8px #00FF41';
+            } else if (fps >= 30) {
+              dotEl.style.backgroundColor = '#FFD700';
+              dotEl.style.boxShadow = '0 0 8px #FFD700';
+            } else {
+              dotEl.style.backgroundColor = '#FF3366';
+              dotEl.style.boxShadow = '0 0 8px #FF3366';
+            }
+          }
+          frameCount = 0;
+          frameTimeAccum = 0;
+          lastFpsUpdate = now;
+        }
+        requestAnimationFrame(fpsLoop);
+      }
+      requestAnimationFrame(fpsLoop);
+
+      // --- Auto-unlock Web Audio on first user interaction ---
+      function unlockAudio() {
+        if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            const ctx = new AudioCtx();
+            if (ctx.state === 'suspended') ctx.resume();
+          }
+        }
+      }
+      window.addEventListener('click', unlockAudio, { once: true });
+      window.addEventListener('keydown', unlockAudio, { once: true });
+
+      // Focus canvas on mouseover for zero-delay controls
+      canvas.addEventListener('mouseenter', () => canvas.focus());
     </script>
   </body>
 </html>

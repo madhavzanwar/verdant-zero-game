@@ -32,6 +32,7 @@ if (fs.existsSync(unityWebglPath)) {
   app.use((req, res, next) => {
     if (req.url.endsWith('.unityweb')) {
       res.setHeader('Content-Encoding', 'gzip');
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
       if (req.url.endsWith('.wasm.unityweb')) {
         res.setHeader('Content-Type', 'application/wasm');
       } else if (req.url.endsWith('.framework.js.unityweb')) {
@@ -42,8 +43,8 @@ if (fs.existsSync(unityWebglPath)) {
     }
     next();
   });
-  // Serve authentic Unity WebGL build directly on /
-  app.use(express.static(unityWebglPath));
+  // Serve authentic Unity WebGL build directly on / with browser cache enabled
+  app.use(express.static(unityWebglPath, { maxAge: '1h' }));
 }
 
 // Optional secondary path for Three.js web runner
@@ -158,23 +159,28 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start listening with port fallback
-function startServer(port) {
-  const srv = app.listen(port, () => {
-    console.log(`[Verdant Zero] Server online and running at http://localhost:${port}`);
-  });
-  srv.on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-      console.log(`[Verdant Zero] Port ${port} is in use, trying port ${port + 1}...`);
-      startServer(port + 1);
-    } else {
-      console.error('[Verdant Zero] Server error:', err);
-    }
+// Start listening with dual-port support (both 3000 and 3001)
+function startServer(initialPort) {
+  const tryPorts = [initialPort, initialPort === 3000 ? 3001 : 3000];
+  let boundCount = 0;
+
+  tryPorts.forEach(p => {
+    const srv = app.listen(p, () => {
+      boundCount++;
+      console.log(`[Verdant Zero] Server online and running at http://localhost:${p}`);
+    });
+    srv.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        // Port in use by another process or instance, silently continue
+      } else {
+        console.error(`[Verdant Zero] Server error on port ${p}:`, err);
+      }
+    });
   });
 }
 
 if (require.main === module) {
-  startServer(PORT);
+  startServer(Number(PORT));
 }
 
 module.exports = app;
